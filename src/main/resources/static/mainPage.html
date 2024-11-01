@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Sharing App</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { margin-top: 20px; }
+    .file-link { text-decoration: none; color: #007bff; cursor: pointer; }
+    .file-link:hover { text-decoration: underline; }
+    .delete-btn { color: red; cursor: pointer; margin-left: 10px; }
+    .tag-block { background-color: #f8f9fa; padding: 15px; border-radius: 8px; }
+    .tag-header { font-size: 1.2em; margin-bottom: 10px; }
+    .compact-form { display: flex; gap: 10px; align-items: center; }
+    .comment-section { margin-top: 15px; }
+    .comment-item { padding: 5px 0; border-bottom: 1px solid #eaeaea; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <h1 class="text-center mb-4">File Sharing App</h1>
+
+      <!-- Блок для управления тегами -->
+      <div class="tag-block mb-4">
+        <div class="tag-header">Manage Tags</div>
+
+        <!-- Форма создания тега -->
+        <form id="tagForm" class="compact-form mb-3">
+          <input type="text" class="form-control" id="tagName" placeholder="New tag name" required>
+          <button type="submit" class="btn btn-secondary btn-sm">Create Tag</button>
+        </form>
+
+        <!-- Список тегов с кнопками удаления -->
+        <ul id="tagList" class="list-group list-group-flush"></ul>
+      </div>
+
+      <!-- Форма для загрузки файлов -->
+      <form id="fileUploadForm" class="mb-4">
+        <div class="mb-3">
+          <label for="fileInput" class="form-label">Upload a new file</label>
+          <input type="file" class="form-control" id="fileInput" name="file" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Upload File</button>
+      </form>
+
+      <!-- Форма для привязки тегов к существующему файлу -->
+      <form id="attachTagForm" class="mb-4">
+        <div class="mb-3">
+          <label for="fileSelect" class="form-label">Select a file to tag</label>
+          <select class="form-select" id="fileSelect" required></select>
+        </div>
+        <div class="mb-3">
+          <label for="tagSelectAttach" class="form-label">Select tags to attach</label>
+          <select multiple class="form-select" id="tagSelectAttach"></select>
+        </div>
+        <button type="submit" class="btn btn-info">Attach Tag</button>
+      </form>
+
+      <!-- Фильтр по тегам -->
+      <div class="mb-4">
+        <label for="tagFilter" class="form-label">Filter by Tag</label>
+        <select id="tagFilter" class="form-select" onchange="filterFilesByTag()">
+          <option value="">All files</option>
+        </select>
+      </div>
+
+
+      <!-- Список файлов -->
+      <div id="fileList" class="list-group"></div>
+      <div id="noFiles" class="alert alert-info text-center mt-4" style="display: none;">No files available</div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  // Инициализация данных при загрузке страницы
+  window.onload = () => {
+    fetchFiles();
+    fetchTags();
+  };
+
+  // Функция для создания тега
+  document.getElementById('tagForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    var tagName = document.getElementById('tagName').value;
+
+    try {
+      const response = await fetch('/api/v1/tags', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: tagName })
+      });
+
+      if (!response.ok) throw new Error('Tag creation failed');
+
+      alert('Tag created successfully!');
+      document.getElementById('tagName').value = '';
+      await fetchTags();
+    } catch (error) {
+      console.error('Error creating tag:', error);
+      alert('Failed to create tag');
+    }
+  });
+
+  async function fetchTags() {
+    try {
+      const response = await fetch('/api/v1/tags', { cache: "no-cache" });
+      if (!response.ok) throw new Error('Failed to fetch tags');
+
+      const tags = await response.json();
+      const tagSelectAttach = document.getElementById('tagSelectAttach');
+      const tagList = document.getElementById('tagList');
+      const tagFilter = document.getElementById('tagFilter');
+
+      tagSelectAttach.innerHTML = '';
+      tagList.innerHTML = '';
+      tagFilter.innerHTML = '<option value="">All files</option>'; // Сбрасываем и заполняем фильтр
+
+      tags.forEach(tag => {
+        // Добавление тега в выпадающий список для привязки к файлу
+        const optionAttach = document.createElement('option');
+        optionAttach.value = tag.id;
+        optionAttach.textContent = tag.name;
+        tagSelectAttach.appendChild(optionAttach);
+
+        // Добавление тега в фильтр по тегу
+        const optionFilter = document.createElement('option');
+        optionFilter.value = tag.id;
+        optionFilter.textContent = tag.name;
+        tagFilter.appendChild(optionFilter);
+
+        // Добавление тега в список с кнопкой удаления
+        const tagItem = document.createElement('li');
+        tagItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+        tagItem.innerHTML = `
+      <span>${tag.name}</span>
+      <button class="btn btn-outline-danger btn-sm" onclick="deleteTag(${tag.id})">Delete</button>
+    `;
+        tagList.appendChild(tagItem);
+      });
+    } catch (error) {
+      console.error('Error fetching tags:', error);
+    }
+  }
+
+
+
+
+
+  // Функция для удаления тега
+  async function deleteTag(tagId) {
+    if (!confirm('Are you sure you want to delete this tag?')) return;
+
+    try {
+      const response = await fetch(`/api/v1/tags/${tagId}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error('Failed to delete tag');
+
+      alert('Tag deleted successfully!');
+      await fetchTags();
+      await fetchFiles();
+    } catch (error) {
+      console.error('Error deleting tag:', error);
+      alert('Failed to delete tag');
+    }
+  }
+
+  async function filterFilesByTag() {
+    const selectedTag = document.getElementById('tagFilter').value;
+    await fetchFiles(selectedTag);
+  }
+
+
+
+
+  // Функция для загрузки списка файлов
+  async function fetchFiles(tagId = "") {
+    try {
+      let url = '/api/v1';
+      if (tagId) url += `?tagId=${tagId}`;
+
+      const response = await fetch(url, { cache: "no-cache" });
+      if (!response.ok) throw new Error('Network response was not ok');
+
+      const files = await response.json();
+      const fileListElement = document.getElementById('fileList');
+      const noFilesElement = document.getElementById('noFiles');
+      const fileSelect = document.getElementById('fileSelect');
+      fileListElement.innerHTML = '';
+      fileSelect.innerHTML = '';
+
+      if (files.length > 0) {
+        noFilesElement.style.display = 'none';
+        files.forEach(file => {
+          const fileItem = document.createElement('div');
+          fileItem.className = 'list-group-item';
+
+          const fileHeader = document.createElement('div');
+          fileHeader.className = 'd-flex justify-content-between align-items-center';
+
+          const fileLink = document.createElement('a');
+          fileLink.className = 'file-link';
+          fileLink.textContent = file.name;
+          fileLink.addEventListener('click', () => downloadFile(file.id, file.name));
+          fileHeader.appendChild(fileLink);
+
+          const deleteButton = document.createElement('span');
+          deleteButton.className = 'delete-btn';
+          deleteButton.textContent = 'Delete';
+          deleteButton.addEventListener('click', () => deleteFile(file.id));
+          fileHeader.appendChild(deleteButton);
+          fileItem.appendChild(fileHeader);
+
+          // Добавление отображения тегов
+          const tagsContainer = document.createElement('div');
+          tagsContainer.className = 'mt-2';
+
+          if (file.tags && Array.isArray(file.tags) && file.tags.length > 0) {
+            const tagsText = file.tags.map(tag => tag.name).join(', ');
+            tagsContainer.innerHTML = `<strong>Tags:</strong> ${tagsText}`;
+          } else {
+            tagsContainer.innerHTML = '<strong>Tags:</strong> None';
+          }
+
+          fileItem.appendChild(tagsContainer);
+          fileListElement.appendChild(fileItem);
+
+          const option = document.createElement('option');
+          option.value = file.id;
+          option.textContent = file.name;
+          fileSelect.appendChild(option);
+
+          // Загрузка комментариев для каждого файла
+          fetchComments(file.id);
+        });
+      } else {
+        noFilesElement.style.display = 'block';
+      }
+    } catch (error) {
+      console.error('Error fetching files:', error);
+    }
+  }
+
+
+  // Функция для отправки файла на сервер без тегов
+  document.getElementById('fileUploadForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const formData = new FormData();
+    const fileInput = document.getElementById('fileInput');
+    formData.append('file', fileInput.files[0]);
+
+    try {
+      const response = await fetch('/api/v1/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) throw new Error('File upload failed');
+
+      alert('File uploaded successfully!');
+      fileInput.value = '';
+      await fetchFiles();
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      alert('Failed to upload file');
+    }
+  });
+
+  // Функция для привязки тега к существующему файлу
+  document.getElementById('attachTagForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const fileId = document.getElementById('fileSelect').value;
+    const tagSelectAttach = document.getElementById('tagSelectAttach');
+    const selectedTags = Array.from(tagSelectAttach.selectedOptions).map(option => option.value);
+
+    // Проверка на наличие выбранных тегов
+    if (selectedTags.length === 0) {
+      console.error('No tags selected');
+      alert('Please select at least one tag');
+      return;
+    }
+
+    // Проверка выбранных тегов и содержимого запроса перед отправкой
+    console.log('Selected tags:', selectedTags);
+
+    try {
+      const body = JSON.stringify({ tags: selectedTags });
+      console.log('Request body:', body);
+
+      const response = await fetch(`/api/v1/files/${fileId}/attach-tags`, { // Исправлены обратные кавычки
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: body
+      });
+
+      if (!response.ok) throw new Error(`Failed to attach tags to file. Status: ${response.status}`); // Исправлены обратные кавычки
+
+      alert('Tags attached successfully!');
+      await fetchFiles();
+    } catch (error) {
+      console.error('Error attaching tags:', error);
+      alert('Failed to attach tags');
+    }
+  });
+
+
+
+  // Функция для удаления файла
+  async function deleteFile(fileId) {
+    const confirmDelete = confirm('Are you sure you want to delete this file?');
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch(`/api/v1/files/${fileId}/delete`, { method: 'DELETE' });
+      if (!response.ok) throw new Error('Failed to delete file');
+
+      alert('File deleted successfully!');
+      await fetchFiles();
+    } catch (error) {
+      console.error('Error deleting file:', error);
+      alert('Failed to delete file');
+    }
+  }
+
+  // Функция для скачивания файла
+  function downloadFile(fileId, fileName) {
+    window.open(`/api/v1/files/${fileId}/download`, '_blank');
+  }
+
+  // Функция для добавления комментария
+  async function addComment(event, fileId) {
+    event.preventDefault();
+
+    const commentInput = document.getElementById(`commentInput-${fileId}`);
+    const commentText = commentInput.value.trim();
+
+    if (!commentText) return;
+
+    try {
+      const response = await fetch(`/api/v1/files/${fileId}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: commentText })
+      });
+
+      if (!response.ok) throw new Error('Failed to add comment');
+
+      commentInput.value = '';
+      await fetchComments(fileId); // Обновите список комментариев после добавления
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      alert('Failed to add comment');
+    }
+  }
+
+  // Функция для загрузки комментариев
+  async function fetchComments(fileId) {
+    try {
+      const response = await fetch(`/api/v1/files/${fileId}/comments`);
+      if (!response.ok) throw new Error('Failed to fetch comments');
+
+      const comments = await response.json();
+      const commentsList = document.getElementById(`commentsList-${fileId}`);
+      commentsList.innerHTML = '';
+
+      comments.forEach(comment => {
+        const commentItem = document.createElement('div');
+        commentItem.className = 'comment-item';
+        commentItem.textContent = comment.text;
+        commentsList.appendChild(commentItem);
+      });
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    }
+  }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
