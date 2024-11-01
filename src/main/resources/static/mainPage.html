@@ -177,12 +177,10 @@
 
 
   // Функция для загрузки списка файлов
-  async function fetchFiles(tagId = "") {
+  // Функция для загрузки списка файлов
+  async function fetchFiles() {
     try {
-      let url = '/api/v1';
-      if (tagId) url += `?tagId=${tagId}`;
-
-      const response = await fetch(url, { cache: "no-cache" });
+      const response = await fetch('/api/v1', { cache: "no-cache" });
       if (!response.ok) throw new Error('Network response was not ok');
 
       const files = await response.json();
@@ -226,6 +224,38 @@
           }
 
           fileItem.appendChild(tagsContainer);
+
+          // Добавление комментариев
+          const commentSection = document.createElement('div');
+          commentSection.className = 'comment-section';
+          commentSection.id = `commentSection-${file.id}`;
+
+          const commentForm = document.createElement('form');
+          commentForm.className = 'comment-form';
+          commentForm.id = `commentForm-${file.id}`;
+          commentForm.addEventListener('submit', (e) => addComment(e, file.id));
+
+          const commentInput = document.createElement('input');
+          commentInput.type = 'text';
+          commentInput.className = 'form-control';
+          commentInput.placeholder = 'Add a comment';
+          commentInput.id = `commentInput-${file.id}`;
+          commentForm.appendChild(commentInput);
+
+          const commentButton = document.createElement('button');
+          commentButton.type = 'submit';
+          commentButton.className = 'btn btn-secondary';
+          commentButton.textContent = 'Submit';
+          commentForm.appendChild(commentButton);
+
+          const commentsList = document.createElement('div');
+          commentsList.className = 'comments-list';
+          commentsList.id = `commentsList-${file.id}`;
+
+          commentSection.appendChild(commentForm);
+          commentSection.appendChild(commentsList);
+          fileItem.appendChild(commentSection);
+
           fileListElement.appendChild(fileItem);
 
           const option = document.createElement('option');
@@ -243,6 +273,7 @@
       console.error('Error fetching files:', error);
     }
   }
+
 
 
   // Функция для отправки файла на сервер без тегов
