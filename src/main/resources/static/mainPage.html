@@ -177,10 +177,12 @@
 
 
   // Функция для загрузки списка файлов
-  // Функция для загрузки списка файлов
-  async function fetchFiles() {
+  async function fetchFiles(tagId = "") {
     try {
-      const response = await fetch('/api/v1', { cache: "no-cache" });
+      let url = '/api/v1';
+      if (tagId) url += `?tagId=${tagId}`;
+
+      const response = await fetch(url, { cache: "no-cache" });
       if (!response.ok) throw new Error('Network response was not ok');
 
       const files = await response.json();
@@ -224,6 +226,7 @@
           }
 
           fileItem.appendChild(tagsContainer);
+          fileListElement.appendChild(fileItem);
 
           // Добавление комментариев
           const commentSection = document.createElement('div');
@@ -256,8 +259,6 @@
           commentSection.appendChild(commentsList);
           fileItem.appendChild(commentSection);
 
-          fileListElement.appendChild(fileItem);
-
           const option = document.createElement('option');
           option.value = file.id;
           option.textContent = file.name;
@@ -273,7 +274,6 @@
       console.error('Error fetching files:', error);
     }
   }
-
 
 
   // Функция для отправки файла на сервер без тегов
