@@ -2,7 +2,7 @@ spring:
   liquibase:
     enabled: true
   datasource:
-    url: jdbc:postgresql://localhost:5433/forall
+    url: jdbc:postgresql://db:5432/forall
     username: postgres
     password: 503812
     driver-class-name: org.postgresql.Driver
