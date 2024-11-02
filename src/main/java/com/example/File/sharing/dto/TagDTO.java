@@ -15,7 +15,6 @@ public class TagDTO {
     private int id; // Добавьте идентификатор
     private String name; // И имя
 
-    // Конструкторы
     public TagDTO() {
     }
 
@@ -24,7 +23,6 @@ public class TagDTO {
         this.name = name;
     }
 
-    // Геттеры и сеттеры
     public int getId() {
         return id;
     }

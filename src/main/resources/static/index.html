@@ -147,10 +147,6 @@
     }
   }
 
-
-
-
-
   // Функция для удаления тега
   async function deleteTag(tagId) {
     if (!confirm('Are you sure you want to delete this tag?')) return;
@@ -172,9 +168,6 @@
     const selectedTag = document.getElementById('tagFilter').value;
     await fetchFiles(selectedTag);
   }
-
-
-
 
   // Функция для загрузки списка файлов
   async function fetchFiles(tagId = "") {
@@ -275,7 +268,6 @@
     }
   }
 
-
   // Функция для отправки файла на сервер без тегов
   document.getElementById('fileUploadForm').addEventListener('submit', async function(event) {
     event.preventDefault();
@@ -338,8 +330,6 @@
       alert('Failed to attach tags');
     }
   });
-
-
 
   // Функция для удаления файла
   async function deleteFile(fileId) {

@@ -2,9 +2,9 @@ spring:
   liquibase:
     enabled: true
   datasource:
-    url: jdbc:postgresql://db:5432/forall
+    url: jdbc:postgresql://db:5432/postgres
     username: postgres
-    password: 503812
+    password: postgres
     driver-class-name: org.postgresql.Driver
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect

@@ -1,7 +1,5 @@
 package com.example.File.sharing.services;
 
-
-import com.example.File.sharing.models.Comment;
 import com.example.File.sharing.models.Tag;
 import com.example.File.sharing.repositories.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;

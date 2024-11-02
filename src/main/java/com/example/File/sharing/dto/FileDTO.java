@@ -1,14 +1,6 @@
 package com.example.File.sharing.dto;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotEmpty;
-import org.hibernate.validator.constraints.Email;
-
 import java.util.List;
-import java.util.Set;
 
 public class FileDTO {
     private int id;
