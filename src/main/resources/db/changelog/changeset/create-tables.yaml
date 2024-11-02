@@ -1,0 +1,83 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-author
+      author: dmitriylarin
+      changes:
+        - createTable:
+            tableName: file
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: true
+
+        - createTable:
+            tableName: comment
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: file_id
+                  type: int
+                  constraints:
+                    nullable: false
+                    references: File(id)
+                    foreignKeyName: fk_comment_file
+              - column:
+                  name: text
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: tag
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: file_tag
+            columns:
+              - column:
+                  name: file_id
+                  type: int
+                  constraints:
+                    nullable: false
+                    references: File(id)
+                    foreignKeyName: fk_file_tag_file
+              - column:
+                  name: tag_id
+                  type: int
+                  constraints:
+                    nullable: false
+                    references: Tag(id)
+                    foreignKeyName: fk_file_tag_tag
+
+        - addPrimaryKey:
+            tableName: file_tag
+            columnNames: file_id, tag_id
