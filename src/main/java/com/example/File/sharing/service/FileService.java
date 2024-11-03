@@ -1,12 +1,12 @@
-package com.example.File.sharing.services;
+package com.example.File.sharing.service;
 
-import com.example.File.sharing.models.Tag;
-import com.example.File.sharing.repositories.FileRepository;
+import com.example.File.sharing.entity.Tag;
+import com.example.File.sharing.repository.FileRepository;
 import com.example.File.sharing.exception.FileNotFoundException;
-import com.example.File.sharing.models.File;
-import com.example.File.sharing.repositories.TagRepository;
+import com.example.File.sharing.entity.File;
+import com.example.File.sharing.repository.TagRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +19,7 @@ import java.util.Optional;
 @Service
 @Transactional
 @Slf4j
+@RequiredArgsConstructor
 public class FileService {
     static final long FILE_EXPIRATION_DAYS = 14;
 
@@ -27,19 +28,10 @@ public class FileService {
     private final FileRepository fileRepository;
     private final TagRepository tagRepository;
 
-    @Autowired
-    public FileService(FileRepository fileRepository, TagRepository tagRepository,
-                       RestTemplate restTemplate) {
-        this.fileRepository = fileRepository;
-        this.tagRepository = tagRepository;
-        this.restTemplate = restTemplate;
-    }
-
     public List<File> findAll() {
         return fileRepository.findAll();
     }
 
-    @Transactional
     public void attachTagsToFile(int fileId, List<Integer> tagIds) throws FileNotFoundException {
         File file = fileRepository.findById(fileId)
                 .orElseThrow(FileNotFoundException::new);

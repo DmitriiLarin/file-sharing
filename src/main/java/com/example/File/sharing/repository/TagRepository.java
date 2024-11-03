@@ -1,6 +1,6 @@
-package com.example.File.sharing.repositories;
+package com.example.File.sharing.repository;
 
-import com.example.File.sharing.models.Tag;
+import com.example.File.sharing.entity.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,7 +1,7 @@
-package com.example.File.sharing.repositories;
+package com.example.File.sharing.repository;
 
-import com.example.File.sharing.models.Comment;
-import com.example.File.sharing.models.File;
+import com.example.File.sharing.entity.Comment;
+import com.example.File.sharing.entity.File;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

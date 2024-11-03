@@ -1,8 +1,8 @@
-package com.example.File.sharing.services;
+package com.example.File.sharing.service;
 
-import com.example.File.sharing.models.Tag;
-import com.example.File.sharing.repositories.TagRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.File.sharing.entity.Tag;
+import com.example.File.sharing.repository.TagRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,14 +11,10 @@ import java.util.Optional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class TagService {
 
     private final TagRepository tagRepository;
-
-    @Autowired
-    public TagService(TagRepository tagRepository) {
-        this.tagRepository = tagRepository;
-    }
 
     public void deleteTagById(Integer tagId) {
         tagRepository.deleteById(tagId);
@@ -32,7 +28,6 @@ public class TagService {
         return tagRepository.findAll();
     }
 
-    @Transactional
     public Tag save(Tag tag) {
         return tagRepository.save(tag);
     }

@@ -1,4 +1,4 @@
-package com.example.File.sharing.services;
+package com.example.File.sharing.service;
 
 import com.example.File.sharing.client.S3Client;
 import org.springframework.stereotype.Service;

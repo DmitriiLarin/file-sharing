@@ -1,4 +1,4 @@
-package com.example.File.sharing.services;
+package com.example.File.sharing.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -13,8 +13,7 @@ public class FileCleanupSchedulerService {
         this.fileService = fileService;
     }
 
-//    @Scheduled(cron = "0 0 0 * * ?")
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "0 0 * * * ?")
     public void scheduleFileCleanup() {
         fileService.deleteExpiredFiles();
     }

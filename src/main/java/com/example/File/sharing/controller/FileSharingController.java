@@ -3,17 +3,20 @@ package com.example.File.sharing.controller;
 import com.example.File.sharing.dto.FileDTO;
 import com.example.File.sharing.dto.TagDTO;
 import com.example.File.sharing.exception.FileNotFoundException;
-import com.example.File.sharing.models.Comment;
-import com.example.File.sharing.models.File;
-import com.example.File.sharing.models.Tag;
-import com.example.File.sharing.services.CommentService;
-import com.example.File.sharing.services.FileService;
-import com.example.File.sharing.services.S3Service;
-import com.example.File.sharing.services.TagService;
+import com.example.File.sharing.entity.Comment;
+import com.example.File.sharing.entity.File;
+import com.example.File.sharing.entity.Tag;
+import com.example.File.sharing.service.CommentService;
+import com.example.File.sharing.service.FileService;
+import com.example.File.sharing.service.S3Service;
+import com.example.File.sharing.service.TagService;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -28,10 +31,9 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-
-
 @RestController
 @RequestMapping("/api/v1")
+@RequiredArgsConstructor
 public class FileSharingController {
 
     private final ModelMapper modelMapper;
@@ -40,17 +42,6 @@ public class FileSharingController {
     private final S3Service s3Service;
     private final TagService tagService;
     private final CommentService commentService;
-
-    @Autowired
-    public FileSharingController(ModelMapper modelMapper, FileService fileService,
-                                 S3Service s3Service, TagService tagService,
-                                 CommentService commentService) {
-        this.modelMapper = modelMapper;
-        this.fileService = fileService;
-        this.s3Service = s3Service;
-        this.tagService = tagService;
-        this.commentService = commentService;
-    }
 
     @GetMapping
     public ResponseEntity<List<FileDTO>> getAllFiles(@RequestParam(value = "tagId", required = false) Integer tagId) {
@@ -68,7 +59,6 @@ public class FileSharingController {
 
         return ResponseEntity.ok(fileDTOs);
     }
-
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
