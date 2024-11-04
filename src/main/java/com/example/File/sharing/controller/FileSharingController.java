@@ -193,11 +193,8 @@ public class FileSharingController {
             System.out.println(lifeTime.getHours());
             File file = fileService.findById(fileId)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found"));
-            System.out.println("a");
             lifeTime.setFile(file);
-            System.out.println("a");
             LifeTime savedTime = lifeTimeService.save(lifeTime);
-            System.out.println("a");
             return ResponseEntity.status(HttpStatus.CREATED).body(savedTime);
         }
         catch (Exception e){

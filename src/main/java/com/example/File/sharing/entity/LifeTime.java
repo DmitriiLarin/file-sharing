@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +29,7 @@ public class LifeTime {
     private int id;
 
     @Column(name = "hours")
-    @NotEmpty(message = "time should not be empty")
+    @NotNull(message = "time should not be empty")
     private int hours;
 
     @OneToOne

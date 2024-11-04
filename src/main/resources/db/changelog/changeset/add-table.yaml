@@ -24,7 +24,7 @@ databaseChangeLog:
                     unique: true
         - addForeignKeyConstraint:
             constraintName: fk_life_time_file_id
-            baseTableName: lifetime
+            baseTableName: life_time
             baseColumnNames: file_id
             referencedTableName: file
             referencedColumnNames: id
