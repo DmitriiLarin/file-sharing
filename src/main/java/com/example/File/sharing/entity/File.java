@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
@@ -42,6 +43,9 @@ public class File {
 
     @ManyToMany(mappedBy = "files")
     private Set<Tag> tags;
+
+    @OneToOne(mappedBy = "file")
+    private LifeTime lifeTime;
 
     public void addTag(Tag tag) {
         this.tags.add(tag);

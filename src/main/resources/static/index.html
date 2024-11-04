@@ -46,6 +46,20 @@
         <button type="submit" class="btn btn-primary">Upload File</button>
       </form>
 
+      <!-- Форма для установки времени жизни файла -->
+      <form id="fileLifetimeForm" class="mb-4">
+        <div class="mb-3">
+          <label for="fileSelectLifetime" class="form-label">Select a file to set lifetime</label>
+          <select class="form-select" id="fileSelectLifetime" required></select>
+        </div>
+        <div class="mb-3">
+          <label for="fileLifetime" class="form-label">Set Lifetime (in hours)</label>
+          <input type="number" class="form-control" id="fileLifetime" placeholder="Lifetime in hours" required>
+        </div>
+        <button type="submit" class="btn btn-warning">Set Lifetime</button>
+      </form>
+
+
       <!-- Форма для привязки тегов к существующему файлу -->
       <form id="attachTagForm" class="mb-4">
         <div class="mb-3">
@@ -182,6 +196,7 @@
       const fileListElement = document.getElementById('fileList');
       const noFilesElement = document.getElementById('noFiles');
       const fileSelect = document.getElementById('fileSelect');
+      const fileSelectLifetime = document.getElementById('fileSelectLifetime');
       fileListElement.innerHTML = '';
       fileSelect.innerHTML = '';
 
@@ -256,6 +271,11 @@
           option.value = file.id;
           option.textContent = file.name;
           fileSelect.appendChild(option);
+
+          const optionLifetime = document.createElement('option');
+          optionLifetime.value = file.id;
+          optionLifetime.textContent = file.name;
+          fileSelectLifetime.appendChild(optionLifetime);
 
           // Загрузка комментариев для каждого файла
           fetchComments(file.id);
@@ -378,6 +398,34 @@
       alert('Failed to add comment');
     }
   }
+
+  // Обработчик для установки времени жизни файла
+  document.getElementById('fileLifetimeForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const fileId = document.getElementById('fileSelectLifetime').value;
+    const lifetime = document.getElementById('fileLifetime').value;
+
+    try {
+      const response = await fetch(`/api/v1/files/${fileId}/set-lifetime`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ hours: parseInt(lifetime) })
+      });
+
+      if (!response.ok) throw new Error('Failed to set file lifetime');
+
+      alert('File lifetime updated successfully!');
+    } catch (error) {
+      console.error('Error setting file lifetime:', error);
+      alert('Failed to set file lifetime');
+    }
+
+
+  });
+
 
   // Функция для загрузки комментариев
   async function fetchComments(fileId) {

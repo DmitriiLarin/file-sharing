@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-table
+      author: dmitriylarin
+      changes:
+        - createTable:
+            tableName: life_time
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: hours
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file_id
+                  type: int
+                  constraints:
+                    unique: true
+        - addForeignKeyConstraint:
+            constraintName: fk_life_time_file_id
+            baseTableName: lifetime
+            baseColumnNames: file_id
+            referencedTableName: file
+            referencedColumnNames: id
+            onDelete: CASCADE

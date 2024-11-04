@@ -2,12 +2,14 @@ package com.example.File.sharing.controller;
 
 import com.example.File.sharing.dto.FileDTO;
 import com.example.File.sharing.dto.TagDTO;
+import com.example.File.sharing.entity.LifeTime;
 import com.example.File.sharing.exception.FileNotFoundException;
 import com.example.File.sharing.entity.Comment;
 import com.example.File.sharing.entity.File;
 import com.example.File.sharing.entity.Tag;
 import com.example.File.sharing.service.CommentService;
 import com.example.File.sharing.service.FileService;
+import com.example.File.sharing.service.LifeTimeService;
 import com.example.File.sharing.service.S3Service;
 import com.example.File.sharing.service.TagService;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +44,7 @@ public class FileSharingController {
     private final S3Service s3Service;
     private final TagService tagService;
     private final CommentService commentService;
+    private final LifeTimeService lifeTimeService;
 
     @GetMapping
     public ResponseEntity<List<FileDTO>> getAllFiles(@RequestParam(value = "tagId", required = false) Integer tagId) {
@@ -179,6 +182,25 @@ public class FileSharingController {
             tagService.deleteTagById(tagId);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/files/{fileId}/set-lifetime")
+    public ResponseEntity<?> addLifetime(@PathVariable int fileId,
+                                              @RequestBody LifeTime lifeTime){
+        try{
+            System.out.println(lifeTime.getHours());
+            File file = fileService.findById(fileId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found"));
+            System.out.println("a");
+            lifeTime.setFile(file);
+            System.out.println("a");
+            LifeTime savedTime = lifeTimeService.save(lifeTime);
+            System.out.println("a");
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedTime);
+        }
+        catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

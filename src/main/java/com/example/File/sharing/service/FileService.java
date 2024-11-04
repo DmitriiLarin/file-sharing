@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +22,6 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 public class FileService {
-    static final long FILE_EXPIRATION_DAYS = 14;
 
     private final RestTemplate restTemplate;
 
@@ -63,12 +63,15 @@ public class FileService {
         file.setCreatedAt(LocalDateTime.now());
     }
 
-
     public void deleteExpiredFiles() {
-        LocalDateTime expirationDate = LocalDateTime.now().minusDays(FILE_EXPIRATION_DAYS);
-        List<File> expiredFiles = fileRepository.findAllByCreatedAtBefore(expirationDate);
-
-        for (File file : expiredFiles) {
+        List<File> files = new ArrayList<>();
+        for (File file : findAll()) {
+            LocalDateTime expirationDate = LocalDateTime.now().minusHours(Long.parseLong(file.getLifeTime().toString()));
+            if (file.getCreatedAt().isBefore(expirationDate)) {
+                files.add(file);
+            }
+        }
+        for (File file : files) {
             String deleteUrl = "http://localhost:8080/api/v1/files/" + file.getId() + "/delete";
             try {
                 restTemplate.exchange(deleteUrl, HttpMethod.DELETE, null, Void.class);
