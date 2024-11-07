@@ -7,7 +7,7 @@
 3. Приложение доступно по адресу
    http://localhost:8080/index.html
 
-### Использованные технологии:
+### Использованные технологии
 - Spring Boot
 - Postgresql
 - Spring Data Jpa
