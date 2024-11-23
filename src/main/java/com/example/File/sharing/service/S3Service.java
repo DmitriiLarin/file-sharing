@@ -1,6 +1,9 @@
 package com.example.File.sharing.service;
 
 import com.example.File.sharing.client.S3Client;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,16 +16,16 @@ import java.util.concurrent.Executors;
 public class S3Service {
 
     private final S3Client s3Client;
+    private final ExecutorService executorService;
 
-    public S3Service() {
-        this.s3Client = new S3Client(
-                "6b2db27724ac4f0dbbe258e8ff7a3d61",
-                "4e302d6630f045f7a99fc993db83b07e",
-                "https://s3.storage.selcloud.ru",
-                "myserves"
-        );
-
-        ExecutorService executorService = Executors.newFixedThreadPool(10);
+    public S3Service(
+            @Value("${security.s3.accessKey}") String accessKey,
+            @Value("${security.s3.secretKey}") String secretKey,
+            @Value("${security.s3.endpoint}") String endpoint,
+            @Value("${security.s3.bucket}") String bucket
+    ) {
+        this.s3Client = new S3Client(accessKey, secretKey, endpoint, bucket);
+        this.executorService = Executors.newFixedThreadPool(10);
     }
 
     public CompletableFuture<Void> uploadFile(MultipartFile localFilePath, String s3Key) {
@@ -37,4 +40,5 @@ public class S3Service {
         s3Client.deleteFile(s3Key);
     }
 }
+
 

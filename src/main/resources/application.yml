@@ -8,3 +8,12 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+security:
+  s3:
+    accessKey: ${ACCESS_KEY}
+    secretKey: ${SECRET_KEY}
+    endpoint: ${ENDPOINT}
+    bucket: ${BUCKET}
+
+
