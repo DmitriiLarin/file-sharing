@@ -2,10 +2,29 @@
 
 ### Инструкция по запуску
 
-1. Соберите приложение с помощью mvn clean install -DskipTests=true
-2. Запустите приложение с помощью docker-compose up --build
-3. Приложение доступно по адресу
-   http://localhost:8080/index.html
+1. Скопируйте репозиторий командой.
+```angular2html
+git clone https://github.com/DmitriiLarin/file-sharing
+```
+2. Создайте файл ```.env``` в корне репозитория и заполните его.
+```angular2html
+ACCESS_KEY = #YOUR_ACCESS_KEY
+SECRET_KEY = #YOUR_SECREY_KEY
+ENDPOINT = #YOUR_ENDPOINT
+BUCKET = #YOUR_BUCKET_NAME
+```
+3. Соберите приложение.
+```angular2html
+mvn clean install -DskipTests=true
+```
+4. Запустите приложение с помощью Docker.
+```angular2html
+docker-compose up --build
+```
+5. Приложение доступно по адресу.
+```angular2html
+http://localhost:8080/index.html
+```
 
 ### Использованные технологии
 - Spring Boot
@@ -27,9 +46,9 @@
 
 ### Демонстрация работы приложения
 
-![img.png](img.png)
-![img_1.png](img_1.png)
+![img.png](images/img.png)
+![img_1.png](images/img_1.png)
 
 **Пример работы с файлом**
 
-![img_2.png](img_2.png)
+![img_2.png](images/img_2.png)
